@@ -9,7 +9,7 @@ RUN usermod -u 1000 www-data
 RUN docker-php-source extract \
     && apt-get -qq update && apt-get install -y \
                               git zlib1g-dev \
-                              libfreetype6-dev \
+                              libfreetype6-dev vim mysql-client \
                               libjpeg62-turbo-dev \
                               libmcrypt-dev \
                               libpng-dev \
@@ -25,17 +25,21 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 # Xdebug
 RUN pecl install -o -f xdebug-2.4.0
-
-ADD .docker/flarepoint-php/php-xdebug.ini /usr/local/etc/php/conf.d/php-xdebug.ini
+ADD php-xdebug.ini /usr/local/etc/php/conf.d/php-xdebug.ini
 RUN docker-php-ext-enable xdebug
 
 COPY . /var/www/html
 WORKDIR /var/www/html
 
+RUN mkdir -p ./bootstrap/cache
+RUN mkdir -p ./storage
+
 # Set permissions
 RUN chmod 0777 ./bootstrap/cache -R
-RUN chmod 0777 ./storage/* -R
+RUN chmod 0777 ./storage -R
 
-# RUN cd /var/www/html && composer install -q --no-dev -o
+# Initialize things
+# RUN cd /var/www/html && composer install -q --no-dev -o && php artisan migrate --seed && php artisan key:generate
+
 
 CMD ["php-fpm"]

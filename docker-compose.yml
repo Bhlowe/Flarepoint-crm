@@ -23,7 +23,7 @@ services:
 
   db:
     container_name: flarepoint-db
-    image: mysql:latest
+    image: mysql:5.7.23
     volumes:
       - .docker/flarepoint-db/mysql:/var/lib/mysql
       - .docker/flarepoint-db/db/:/docker-entrypoint-initdb.d/
